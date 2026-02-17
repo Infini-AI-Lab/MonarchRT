@@ -394,7 +394,7 @@
             where approximation errors can propagate across steps/frames.
           </p>
           <p>
-            In this setting, we observe that sparsification can be fundamentally brittle, as video attention is not reliably sparse. Essentially, attention maps must carry significantly more information over fewer (causally-masked) steps, so the same redundancy assumptions from bidirectional, many-step diffusion do not hold. This presents a major limitation for adopting these models, as aggressive sparsity is required for true real-time speed but can cause severe quality degradation. This motivates us to explore sparse parameterizations that can still capture the intrinsic structure of video attention.
+            In this setting, we observe that sparsification can be fundamentally brittle, as <strong>video attention is not reliably sparse</strong>. In reality, attention maps must carry significantly more information over fewer (causally-masked) steps, so the same redundancy assumptions from bidirectional, many-step diffusion do not hold. This presents a major limitation for adopting these models, as aggressive sparsity may be required for true real-time speed but can cause severe quality degradation. This seems like an important problem to solve, <strong>especially as latency-critical use cases like world modeling and robotics applications emerge</strong>. This motivates us to explore sparse parameterizations that can still capture the intrinsic structure of video attention.
           </p>
 
           <div style="text-align: center; margin-top: 18px;">
@@ -405,8 +405,8 @@
           </div>
 
           <p style="margin-top: 24px;">
-            Namely, we find that video attention combines <em style="color: #e0710a;">(i) strong spatiotemporal periodic structure</em>,
-            <em style="color: #dd0e0e;">(ii) sparse semantic correspondences</em>, and <em style="color: #7911db;">(iii) intermittent dense mixing</em>, which exceed the representational capacity of even oracle top-$k$ attention. Consider a video latent with frames $f$, height $h$, width $w$ (token count $N = f h w$).
+            In particular, we find that video attention combines <em style="color: #e0710a;">(i) strong spatiotemporal periodic structure</em>,
+            <em style="color: #dd0e0e;">(ii) sparse semantic correspondences</em>, and <em style="color: #7911db;">(iii) intermittent dense mixing</em>, which can exceed the representational capacity of even oracle top-$k$ attention. Consider a video latent with frames $f$, height $h$, width $w$ (token count $N = f h w$).
             Writing indices as $(f_0,h_0,w_0)$ and $(f_1,h_1,w_1)$, we model the (post-softmax) attention matrix $\mathbf{A}$ as
           </p>
 
