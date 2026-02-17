@@ -314,6 +314,65 @@
   </div>
 </section>
 
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Note Box</title>
+  <style>
+    .clarify-box {
+      border: 3px solid #91bcd4;
+      border-radius: 10px;
+      padding: 1.2em;
+      background-color: #fefefe;
+      position: relative;
+      font-family: "Georgia", serif;
+      max-width: 800px;
+      margin: 2em auto;
+      line-height: 1.6;
+    }
+
+    .clarify-box::before {
+      content: "Note";
+      position: absolute;
+      top: -1.4em;
+      left: -0.1em;
+      background-color: #91bcd4;
+      color: white;
+      padding: 0.4em 1em;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    /* Notation dropdown styling */
+    details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details summary::marker {
+      display: none;
+    }
+
+    details[open] summary {
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="clarify-box">
+    While MonarchRT sparsely parameterizes the attention map, it does not directly enforce a sparse mask, and the attention map itself can remain dense. Our speedups come from computing this dense attention via a Monarch-structured factorization, not from skipping tokens/entries.
+  </div>
+
+</body>
+
 <!-- Section: Observations / Model -->
 <section class="section hero is-light" id="analysis">
   <div class="container is-fluid">
@@ -335,8 +394,7 @@
             where approximation errors can propagate across steps/frames.
           </p>
           <p>
-            In this setting, we observe that sparsification can be fundamentally brittle, as video attention is not reliably sparse. Instead, it combines <em style="color: #e0710a;">(i) strong spatiotemporal periodic structure</em>,
-            <em style="color: #dd0e0e;">(ii) sparse semantic correspondences</em>, and <em style="color: #7911db;">(iii) intermittent dense mixing</em>, which exceed the representational capacity of even oracle top-$k$ attention.
+            In this setting, we observe that sparsification can be fundamentally brittle, as video attention is not reliably sparse. Essentially, attention maps must carry significantly more information over fewer (causally-masked) steps, so the same redundancy assumptions from bidirectional, many-step diffusion do not hold. This presents a major limitation for adopting these models, as aggressive sparsity is required for true real-time speed but can cause severe quality degradation. This motivates us to explore sparse parameterizations that can still capture the intrinsic structure of video attention.
           </p>
 
           <div style="text-align: center; margin-top: 18px;">
@@ -347,7 +405,8 @@
           </div>
 
           <p style="margin-top: 24px;">
-            Consider a video latent with frames $f$, height $h$, width $w$ (token count $N = f h w$).
+            Namely, we find that video attention combines <em style="color: #e0710a;">(i) strong spatiotemporal periodic structure</em>,
+            <em style="color: #dd0e0e;">(ii) sparse semantic correspondences</em>, and <em style="color: #7911db;">(iii) intermittent dense mixing</em>, which exceed the representational capacity of even oracle top-$k$ attention. Consider a video latent with frames $f$, height $h$, width $w$ (token count $N = f h w$).
             Writing indices as $(f_0,h_0,w_0)$ and $(f_1,h_1,w_1)$, we model the (post-softmax) attention matrix $\mathbf{A}$ as
           </p>
 
@@ -545,7 +604,7 @@
           <div style="text-align: center; margin-top: 14px;">
             <img src="static/images/monarch_attn_code.png" alt="MonarchAttention and tiled MonarchAttention pseudocode" style="max-width: 95%; border-radius: 8px;">
             <div style="margin-top: 8px; font-size: 14px; color: #555; max-width: 95%; margin-left: auto; margin-right: auto;">
-              <em>Figure 6: MonarchAttention vs. tiled MonarchAttention pseudocode: tiling modifies the refinement updates to operate on smaller sub-blocks.</em>
+              <em>Figure 6: MonarchAttention vs. tiled MonarchAttention pseudocode. Tiling modifies the refinement updates to operate on smaller sub-blocks.</em>
             </div>
           </div>
 
