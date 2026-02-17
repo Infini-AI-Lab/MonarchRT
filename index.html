@@ -117,6 +117,103 @@
       padding: 0.5rem 0.6rem;
       vertical-align: middle;
     }
+
+    /* --- Horizontal scrolling stacked-video comparison (rotated row labels) --- */
+    .video-compare {
+      --thumb-w: 360px;     /* width of each column */
+      --thumb-gap: 18px;    /* gap between columns */
+      --row-gap: 14px;      /* gap between the two rows */
+      --label-w: 64px;      /* narrow label column since we rotate text */
+      --vid-h: calc(var(--thumb-w) * 9 / 16); /* assumes 16:9 */
+    }
+
+    .video-compare__grid {
+      display: grid;
+      grid-template-columns: var(--label-w) 1fr;
+      column-gap: 12px;
+      align-items: start;
+    }
+
+    /* Left labels column */
+    .video-compare__labels {
+      display: flex;
+      flex-direction: column;
+      gap: var(--row-gap);
+      padding-top: 6px; /* alignment tweak */
+    }
+
+    /* Each label box matches the video height */
+    .video-compare__label {
+      height: var(--vid-h);
+      width: var(--label-w);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: rgba(75,108,183,0.10);
+      border: 1px solid rgba(75,108,183,0.25);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    /* Rotate the label text counterclockwise */
+    .video-compare__label span {
+      display: inline-block;
+      transform: rotate(-90deg);
+      transform-origin: center;
+      white-space: nowrap;
+
+      font-weight: 800;
+      color: #1f2d3d;
+      line-height: 1;
+    }
+
+    /* Scroll area */
+    .video-compare__scroll {
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 6px;
+      border-radius: 10px;
+    }
+
+    .video-compare__strip {
+      display: flex;
+      gap: var(--thumb-gap);
+      align-items: flex-start;
+      padding: 6px 2px;
+
+      scroll-snap-type: x mandatory;
+    }
+
+    /* Each column = 2 stacked videos */
+    .video-compare__col {
+      flex: 0 0 auto;
+      width: var(--thumb-w);
+      display: flex;
+      flex-direction: column;
+      gap: var(--row-gap);
+      scroll-snap-align: start;
+    }
+
+    .video-compare__vid {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover; /* or 'contain' */
+      border-radius: 10px;
+      background: #000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+
+    @media (max-width: 768px) {
+      .video-compare {
+        --thumb-w: 280px;
+        --label-w: 54px;
+      }
+      .video-compare__label span {
+        font-size: 0.95rem;
+      }
+    }
   </style>
 </head>
 
@@ -176,37 +273,24 @@
 
 
 <!-- Section: Highlight Figures -->
-<section class="section" style="background: #f7faff; padding-top: 32px; padding-bottom: 16px;">
+<!-- <section class="section" style="background: #f7faff; padding-top: 32px; padding-bottom: 16px;"> -->
   <div class="container is-fluid">
     <div class="columns is-centered">
       <div class="column is-four-fifths">
         <div style="display: flex; gap: 24px; flex-wrap: wrap; justify-content: center;">
-
-          <div id="figure1" class="figure-card">
-            <h4 class="title is-5 figure-title">Regular vs. Tiled Monarch</h4>
-            <a href="#figure1">
-              <img src="static/images/monarch_f4.png" alt="Regular and tiled Monarch parameterization" style="width: 100%; border-radius: 6px;">
-            </a>
-            <figcaption style="text-align: center; margin-top: 8px; font-size: 14px; color: #555;">
-              <em>Figure 1: Tiled Monarch subdivides each Monarch block into smaller tiles, increasing expressivity and enabling predictable refinement.</em>
-            </figcaption>
-          </div>
-
-          <div id="figure2" class="figure-card">
-            <h4 class="title is-5 figure-title">Efficacy of (Aligned) Monarch</h4>
-            <a href="#figure2">
-              <img src="static/images/motivating_example_b.png" alt="Quality comparison of dense, top-k, and Monarch" style="width: 100%; border-radius: 6px;">
-            </a>
-            <figcaption style="text-align: center; margin-top: 8px; font-size: 14px; color: #555;">
-              <em>Figure 2: On Self-Forcing, even oracle top-$k$ attention fails to retain visual quality. Monarch parameterization can succeed, but only when block sizes are aligned with video dimensions; misalignment can introduce permutation-like artifacts.</em>
-            </figcaption>
-          </div>
-
+          <!-- <div class="container is-max-desktop"> -->
+            <div class="content has-text-justified">
+              <video controls preload="metadata" autoplay muted loop playsinline style="width: 100%; height: auto; border-radius: 8px;">
+                <source src="static/videos/demo.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          <!-- </div> -->
         </div>
       </div>
     </div>
   </div>
-</section>
+<!-- </section> -->
 
 
 <!-- Section: TL;DR -->
@@ -222,7 +306,7 @@
             <strong style="color: #4b6cb7;">(1)</strong> video dimension <strong>block alignment</strong>, <strong style="color: #4b6cb7;">(2)</strong> monotonic refinement with compute via <strong>tiled Monarch</strong> parameterization, and
             <strong style="color: #4b6cb7;">(3)</strong> linear iterative refinement overhead, mitigated by <strong>1-iteration + finetuning</strong> and custom Triton kernels.
             Empirically, MonarchRT reaches up to <strong>95% effective attention sparsity</strong> with no quality loss and achieves speedups over FlashAttention(-2, -3, -4) kernels
-            in the range of <strong style="color: #27ae60;">1.3–11.8$\times$</strong>. Notably, <strong style="color: #27ae60;">this enables, for the first time, true real-time 16 FPS video generation with Self-Forcing on a single RTX 5090.</strong>
+            in the range of <strong style="color: #27ae60;">1.4–11.8$\times$</strong>. Notably, <strong style="color: #27ae60;">this enables, for the first time, true real-time 16 FPS video generation with Self-Forcing on a single RTX 5090.</strong>
           </p>
         </div>
       </div>
@@ -257,19 +341,19 @@
 
           <div style="text-align: center; margin-top: 18px;">
             <img src="static/images/motivating_example_a.png" alt="Oracle top-k vs. Monarch approximation error" style="max-width: 90%; border-radius: 8px;">
-            <div style="margin-top: 8px; font-size: 14px; color: #555;">
-              <em>Figure 3: On Self-Forcing, even oracle top-$k$ can incur large attention error at high sparsity, while Monarch preserves structure.</em>
+            <div style="margin-top: 8px; font-size: 14px; color: #555; max-width: 90%; margin-left: auto; margin-right: auto;">
+              <em>Figure 1: MSE of attention map approximation using oracle top-$k$ and Monarch on Self-Forcing for layer 0 head 0 (L0H0) and layer 8 head 7 (L8H7) for varying sparsity levels. Even oracle top-$k$ can incur large errors at high sparsity, while Monarch preserves structure.</em>
             </div>
           </div>
 
           <p style="margin-top: 24px;">
             Consider a video latent with frames $f$, height $h$, width $w$ (token count $N = f h w$).
-            Writing indices as $(f_0,h_0,w_0)$ and $(f_1,h_1,w_1)$, we model the (post-softmax) attention matrix as
+            Writing indices as $(f_0,h_0,w_0)$ and $(f_1,h_1,w_1)$, we model the (post-softmax) attention matrix $\mathbf{A}$ as
           </p>
 
           <p style="margin-bottom: 0px;">
             $$\mathbf{A}_{(f_0,h_0,w_0),(f_1,h_1,w_1)} = \mathbf{D}_{(f_0,h_0,w_0),(f_1,h_1,w_1)} + \mathbf{S}_{(f_0,h_0,w_0),(f_1,h_1,w_1)} + \varepsilon,$$
-            $$\mathbf{D}_{(f_0,h_0,w_0),(f_1,h_1,w_1)} = d_t(f_0,f_1)\, d_h(h_0,h_1)\, d_w(w_0,w_1).$$
+            $$\mathbf{D}_{(f_0,h_0,w_0),(f_1,h_1,w_1)} = d_f(f_0,f_1)\, d_h(h_0,h_1)\, d_w(w_0,w_1).$$
           </p>
           <p>
             Here $\mathbf{D}$ captures <em>separable positional structure</em> (smoothly decaying distances along
@@ -285,8 +369,8 @@
 
           <div style="text-align: center; margin-top: 18px;">
             <img src="static/images/3D_attention_map.png" alt="3D attention map" style="max-width: 82%; border-radius: 8px;">
-            <div style="margin-top: 8px; font-size: 14px; color: #555;">
-              <em>Figure 4: Example 3D attention map, with diagonal bands from positional periodicity + sparse semantic spikes.</em>
+            <div style="margin-top: 8px; font-size: 14px; color: #555; max-width: 82%; margin-left: auto; margin-right: auto;">
+              <em>Figure 2: Illustration of 3D attention map, with diagonal bands from positional periodicity + sparse semantic spikes.</em>
             </div>
           </div>
 
@@ -324,7 +408,7 @@
 
           <h3 class="title is-4" style="margin-top: 22px;">MonarchAttention</h3>
           <p>
-            <strong>MonarchAttention</strong> (Yaras et al.) proposes to approximate the attention matrix
+            <a href="https://arxiv.org/abs/2505.18698" style="color: #2c6eab; text-decoration: underline;"><strong>MonarchAttention</strong></a> (Yaras et al.) proposes to approximate the attention matrix
             $\mathbf{A}=\softmax(\mathbf{Q}\mathbf{K}^\top)\in\mathbb{R}^{N\times N}$ as a Monarch matrix
             by directly optimizing the Monarch factors via an <em>iterative alternating refinement</em> procedure.
             The key practical advantage is that one can update and apply factors $\mathbf{L}$ and $\mathbf{R}$ without
@@ -333,8 +417,8 @@
 
           <div style="text-align: center; margin-top: 14px;">
             <img src="static/images/monarch_f3.png" alt="MonarchAttention pipeline" style="max-width: 95%; border-radius: 8px;">
-            <div style="margin-top: 8px; font-size: 14px; color: #555;">
-              <em>Figure 5: MonarchAttention alternates factor updates to approximate $\softmax(\mathbf{Q}\mathbf{K}^\top)$ without materializing the full attention matrix.</em>
+            <div style="margin-top: 8px; font-size: 14px; color: #555; max-width: 95%; margin-left: auto; margin-right: auto;">
+              <em>Figure 3: MonarchAttention alternates factor updates to approximate $\softmax(\mathbf{Q}\mathbf{K}^\top)$ without materializing the full attention matrix.</em>
             </div>
           </div>
 
@@ -378,21 +462,30 @@
 
           <p>
             This becomes concrete if we focus on representing the positional term
-            $$\mathbf{D}_{(f_0,h_0,w_0),(f_1,h_1,w_1)} = d_t(f_0,f_1)\,d_h(h_0,h_1)\,d_w(w_0,w_1).$$
+            $$\mathbf{D}_{(f_0,h_0,w_0),(f_1,h_1,w_1)} = d_f(f_0,f_1)\,d_h(h_0,h_1)\,d_w(w_0,w_1).$$
             Under the $(b_1,b_2)$ blocking, Monarch enforces a <em>blockwise rank-1</em> form
             $$\widetilde{\mathbf{M}}_{\ell j k i}=\mathbf{L}_{j\ell k}\,\mathbf{R}_{kji}.$$
             Exact representation of $\mathbf{D}$ is possible only if we can assign the three separable terms to the two Monarch factors without mixing axes:
-            $\mathbf{L}$ must contain (a product of) some subset of $\{d_t,d_h,d_w\}$, and $\mathbf{R}$ must contain the remaining term(s).
+            $\mathbf{L}$ must contain (a product of) some subset of $\{d_f,d_h,d_w\}$, and $\mathbf{R}$ must contain the remaining term(s).
             If a spatiotemporal axis is split across both block sizes (misalignment), then neither $\mathbf{L}$ nor $\mathbf{R}$ is indexed by <em>both coordinates</em> of that axis.
             (Here, "both coordinates" refers to the indices along a given axis for a query and key pair, e.g. $(w_0, w_1)$ along the width axis.)
             For example, if the width dimension were split between both block sizes, then one factor would be indexed by $w_0$ while the other is indexed by $w_1$, so the full 2D positional term $d_w(w_0,w_1)$ cannot live entirely inside a single factor.
             In that case, capturing $d_w$ exactly would require it to be rank-1 under the induced split, which is generally not true, so $\mathbf{D}$ cannot be represented exactly.
           </p>
 
+          <div id="figure4" style="text-align: center; margin-top: 14px; margin-bottom: 20px;">
+            <a href="#figure4">
+              <img src="static/images/motivating_example_b.png" alt="Quality comparison of dense, top-k, and Monarch" style="max-width: 60%; border-radius: 8px;">
+            </a>
+            <div style="margin-top: 8px; font-size: 14px; color: #555; max-width: 60%; margin-left: auto; margin-right: auto;">
+              <em>Figure 4: On Self-Forcing, Monarch parameterization can succeed (especially over oracle top-$k$), but only if block sizes are aligned with video dimensions; misalignment can introduce permutation-like artifacts.</em>
+            </div>
+          </div>
+
           <p>
             When each of $f$, $h$, and $w$ is fully contained in exactly one block size, the three separable terms can be assigned cleanly to
             $\mathbf{L}$ and $\mathbf{R}$. For example, with $(b_1,b_2)=(fh,w)$ one valid construction is
-            $$\mathbf{L}_{w_0,(f_0,h_0),(f_1,h_1)}=d_t(f_0,f_1)\,d_h(h_0,h_1),\qquad \mathbf{R}_{(f_1,h_1),w_0,w_1}=d_w(w_0,w_1),$$
+            $$\mathbf{L}_{w_0,(f_0,h_0),(f_1,h_1)}=d_f(f_0,f_1)\,d_h(h_0,h_1),\qquad \mathbf{R}_{(f_1,h_1),w_0,w_1}=d_w(w_0,w_1),$$
             which makes $\mathbf{M}$ reproduce $\mathbf{D}$ exactly.
           </p>
 
@@ -410,7 +503,7 @@
             From the alignment discussion above, there are only <strong>six</strong> block size configurations that exactly preserve the separable positional structure in video.
             This creates a practical limitation: if you want to <em>reduce sparsity</em> (i.e., spend more compute / parameters to improve approximation), the most obvious approach is to
             modify the block sizes $(b_1,b_2)$; however, this is unreliable, as block sizes outside the aligned set are <em>misaligned</em> with spatiotemporal axes, so they may produce worse approximations
-            even when the representation is less sparse (see <a href="#figure2" style="color: #2c6eab; text-decoration: underline;">Figure 2</a>).
+            even when the representation is less sparse (see <a href="#figure4" style="color: #2c6eab; text-decoration: underline;">Figure 4</a>).
           </p>
 
           <p>
@@ -424,10 +517,10 @@
             smaller rank-1 block with effective sizes $\bigl(\tfrac{b_1}{c_1},\tfrac{b_2}{c_2}\bigr)$. This increases parameter count while maintaining expressivity through block size alignment.
           </p>
 
-          <div style="text-align: center; margin-top: 14px;">
-            <img src="static/images/tiled_block_sizes.png" alt="Tiled block sizes" style="max-width: 92%; border-radius: 8px;">
-            <div style="margin-top: 8px; margin-bottom:16px; font-size: 14px; color: #555;">
-              <em>Figure 6: Example for a single frame of how tiling subdivides each aligned block into smaller sub-blocks, improving locality while keeping aligned structure.</em>
+          <div style="text-align: center; margin-top: 14px; margin-bottom: 20px;">
+            <img src="static/images/monarch_f4.png" alt="Tiled block sizes" style="max-width: 92%; border-radius: 8px;">
+            <div style="margin-top: 8px; margin-bottom:16px; font-size: 14px; color: #555; max-width: 92%; margin-left: auto; margin-right: auto;">
+              <em>Figure 5: Comparison of regular and Tiled Monarch. Tiled Monarch subdivides each block into smaller tiles, improving locality while keeping aligned structure.</em>
             </div>
           </div>
 
@@ -435,6 +528,7 @@
             <strong>Tiled Monarch strictly generalizes untiled Monarch.</strong>
             For the same base block sizes $(b_1,b_2)$, untiled Monarch is a special case of tiled Monarch: set the subtile parameters so that all subtiles within an original block share the same rank-1 factors. Therefore,
             $$\mathcal{M}(b_1,b_2)\subseteq \mathcal{M}_{\mathrm{tile}}(b_1,b_2;c_1,c_2).$$
+            Here $\mathcal{M}(b_1,b_2)$ denotes the set of (untiled) Monarch matrices with block sizes $(b_1,b_2)$, and $\mathcal{M}_{\mathrm{tile}}(b_1,b_2;c_1,c_2)$ denotes the set of tiled Monarch matrices with the same base block sizes and tiling factors $(c_1,c_2)$.
             When $c_1>1$ or $c_2>1$, this containment is strict: tiled Monarch can exactly parameterize certain matrices that violate the rank-$1$ constraint of an untiled block. Concretely, let $\boldsymbol{B}^{(j,k)}\in\mathbb{R}^{b_1\times b_2}$ denote the $(j,k)$-th untiled block, and focus on the specific block $\boldsymbol{B}^{(0,0)}$.
             Pick two coordinates $(r_1,s_1)$ and $(r_2,s_2)$ with $r_1\neq r_2$ and $s_1\neq s_2$ that lie in <em>different</em> subtiles of this same block, and set all subtiles to zero except those two; within each of the two chosen subtiles,
             set all entries to zero except at its designated coordinate $(r_1,s_1)$ or $(r_2,s_2)$, so that
@@ -450,8 +544,8 @@
 
           <div style="text-align: center; margin-top: 14px;">
             <img src="static/images/monarch_attn_code.png" alt="MonarchAttention and tiled MonarchAttention pseudocode" style="max-width: 95%; border-radius: 8px;">
-            <div style="margin-top: 8px; font-size: 14px; color: #555;">
-              <em>Figure 7: MonarchAttention vs. tiled MonarchAttention pseudocode: tiling modifies the refinement updates to operate on smaller sub-blocks.</em>
+            <div style="margin-top: 8px; font-size: 14px; color: #555; max-width: 95%; margin-left: auto; margin-right: auto;">
+              <em>Figure 6: MonarchAttention vs. tiled MonarchAttention pseudocode: tiling modifies the refinement updates to operate on smaller sub-blocks.</em>
             </div>
           </div>
 
@@ -471,8 +565,8 @@
 
           <div style="text-align: center; margin-top: 14px;">
             <img src="static/images/iterations.png" alt="Iterations vs. quality" style="max-width: 92%; border-radius: 8px;">
-            <div style="margin-top: 8px; margin-bottom: 16px; font-size: 14px; color: #555;">
-              <em>Figure 8: Iterative refinement improves quality but costs scale with iterations; finetuning recovers the quality of many iterations using 1.</em>
+            <div style="margin-top: 8px; margin-bottom: 16px; font-size: 14px; color: #555; max-width: 92%; margin-left: auto; margin-right: auto;">
+              <em>Figure 7: Iterative refinement improves quality but costs scale with iterations; finetuning recovers the quality of many iterations using 1.</em>
             </div>
           </div>
 
@@ -483,8 +577,8 @@
 
           <div style="text-align: center; margin-top: 14px;">
             <img src="static/images/kernel_vis.png" alt="Kernel visualization" style="max-width: 92%; border-radius: 8px;">
-            <div style="margin-top: 16px; font-size: 14px; color: #555;">
-              <em>Figure 9: Two-stage kernel visualization for tiled MonarchAttention forward pass.</em>
+            <div style="margin-top: 16px; font-size: 14px; color: #555; max-width: 92%; margin-left: auto; margin-right: auto;">
+              <em>Figure 8: Two-stage kernel visualization for tiled MonarchAttention forward pass.</em>
             </div>
           </div>
 
@@ -512,10 +606,114 @@
             On Self-Forcing, we reach <strong>95% attention sparsity</strong> while matching dense attention on VBench.
           </p>
 
-          <div style="text-align: center; margin-top: 10px;">
-            <img src="static/images/self_forcing_samples.png" alt="Self-Forcing example generations" style="max-width: 95%; border-radius: 8px;">
-            <div style="margin-top: 8px; margin-bottom: 16px; font-size: 14px; color: #555;">
-              <em>Figure 10: Example generations on autoregressive Self-Forcing. MonarchRT preserves fidelity at high sparsity.</em>
+          <div class="video-compare" style="margin-top: 10px;">
+            <div class="video-compare__grid">
+              <!-- Fixed left labels (rotated) -->
+              <div class="video-compare__labels">
+                <div class="video-compare__label"><span>Dense Attention</span></div>
+                <div class="video-compare__label"><span>MonarchRT</span></div>
+              </div>
+
+              <!-- Horizontally scrolling strip -->
+              <div class="video-compare__scroll" role="region" aria-label="Dense vs MonarchRT video comparisons">
+                <div class="video-compare__strip">
+
+                  <div class="video-compare__col">
+                    <video class="video-compare__vid" autoplay muted loop playsinline preload="metadata" controls>
+                      <source src="static/videos/dense/000.mp4" type="video/mp4">
+                    </video>
+                    <video class="video-compare__vid" autoplay muted loop playsinline preload="metadata" controls>
+                      <source src="static/videos/monarch/000.mp4" type="video/mp4">
+                    </video>
+                  </div>
+
+                  <div class="video-compare__col">
+                    <video class="video-compare__vid" autoplay muted loop playsinline preload="metadata" controls>
+                      <source src="static/videos/dense/001.mp4" type="video/mp4">
+                    </video>
+                    <video class="video-compare__vid" autoplay muted loop playsinline preload="metadata" controls>
+                      <source src="static/videos/monarch/001.mp4" type="video/mp4">
+                    </video>
+                  </div>
+
+                  <div class="video-compare__col">
+                    <video class="video-compare__vid" autoplay muted loop playsinline preload="metadata" controls>
+                      <source src="static/videos/dense/002.mp4" type="video/mp4">
+                    </video>
+                    <video class="video-compare__vid" autoplay muted loop playsinline preload="metadata" controls>
+                      <source src="static/videos/monarch/002.mp4" type="video/mp4">
+                    </video>
+                  </div>
+
+                  <div class="video-compare__col">
+                    <video class="video-compare__vid" autoplay muted loop playsinline preload="metadata" controls>
+                      <source src="static/videos/dense/003.mp4" type="video/mp4">
+                    </video>
+                    <video class="video-compare__vid" autoplay muted loop playsinline preload="metadata" controls>
+                      <source src="static/videos/monarch/003.mp4" type="video/mp4">
+                    </video>
+                  </div>
+
+                  <div class="video-compare__col">
+                    <video class="video-compare__vid" autoplay muted loop playsinline preload="metadata" controls>
+                      <source src="static/videos/dense/004.mp4" type="video/mp4">
+                    </video>
+                    <video class="video-compare__vid" autoplay muted loop playsinline preload="metadata" controls>
+                      <source src="static/videos/monarch/004.mp4" type="video/mp4">
+                    </video>
+                  </div>
+
+                  <div class="video-compare__col">
+                    <video class="video-compare__vid" autoplay muted loop playsinline preload="metadata" controls>
+                      <source src="static/videos/dense/005.mp4" type="video/mp4">
+                    </video>
+                    <video class="video-compare__vid" autoplay muted loop playsinline preload="metadata" controls>
+                      <source src="static/videos/monarch/005.mp4" type="video/mp4">
+                    </video>
+                  </div>
+
+                  <div class="video-compare__col">
+                    <video class="video-compare__vid" autoplay muted loop playsinline preload="metadata" controls>
+                      <source src="static/videos/dense/006.mp4" type="video/mp4">
+                    </video>
+                    <video class="video-compare__vid" autoplay muted loop playsinline preload="metadata" controls>
+                      <source src="static/videos/monarch/006.mp4" type="video/mp4">
+                    </video>
+                  </div>
+
+                  <div class="video-compare__col">
+                    <video class="video-compare__vid" autoplay muted loop playsinline preload="metadata" controls>
+                      <source src="static/videos/dense/007.mp4" type="video/mp4">
+                    </video>
+                    <video class="video-compare__vid" autoplay muted loop playsinline preload="metadata" controls>
+                      <source src="static/videos/monarch/007.mp4" type="video/mp4">
+                    </video>
+                  </div>
+
+                  <div class="video-compare__col">
+                    <video class="video-compare__vid" autoplay muted loop playsinline preload="metadata" controls>
+                      <source src="static/videos/dense/008.mp4" type="video/mp4">
+                    </video>
+                    <video class="video-compare__vid" autoplay muted loop playsinline preload="metadata" controls>
+                      <source src="static/videos/monarch/008.mp4" type="video/mp4">
+                    </video>
+                  </div>
+
+                  <div class="video-compare__col">
+                    <video class="video-compare__vid" autoplay muted loop playsinline preload="metadata" controls>
+                      <source src="static/videos/dense/009.mp4" type="video/mp4">
+                    </video>
+                    <video class="video-compare__vid" autoplay muted loop playsinline preload="metadata" controls>
+                      <source src="static/videos/monarch/009.mp4" type="video/mp4">
+                    </video>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top: 8px; margin-bottom: 16px; font-size: 14px; color: #555; text-align: center;">
+              <em>Example generations on autoregressive Self-Forcing, comparing dense attention and MonarchRT at 95% sparsity.</em>
             </div>
           </div>
 
@@ -609,6 +807,11 @@
           <p style="margin-top: 10px;">
             Furthermore, applying <span class="monospace">torch.compile</span> to MonarchRT at 95% sparsity yields an even higher practical end-to-end throughput gain:
             on RTX 5090 at 480p, FlashAttention-2 achieves <strong>11 FPS</strong> while MonarchRT achieves <strong>16 FPS</strong>, without requiring any additional lossy optimizations.
+          </p>
+
+          <p style="margin-top: 10px;">
+            We can further push MonarchRT to achieve even higher theoretical speedups; for example, MonarchRT provides an 11.8$\times$ attention speedup over
+            FA-2 on RTX 5090 for bidirectional attention with 720p video dimensions, at 98% effective sparsity. More detailed experiments are included in the paper.
           </p>
         </div>
       </div>
